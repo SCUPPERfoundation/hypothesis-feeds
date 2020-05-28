@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hypothesis-feeds
+  namespace: hypothesis-feeds
+  labels:
+    app: hypothesis-feeds
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hypothesis-feeds
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: hypothesis-feeds
+    spec:
+      containers:
+      - name: hypothesis-feeds
+        image: <IMAGE>
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 100m
+        env:
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-postgresql
+                key: postgresql-password
+      imagePullSecrets:
+      - name: gprlogin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hypothesis-feeds-service
+  namespace: hypothesis-feeds
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "hypothesis-feeds.projects.tennica.net"
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 5000
+  selector:
+    app: hypothesis-feeds
