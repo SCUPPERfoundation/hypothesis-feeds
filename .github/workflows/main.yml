@@ -1,0 +1,47 @@
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  build:
+    name: Build, push, and deploy
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout master
+      uses: actions/checkout@master
+
+    - name: Build, Tag, Push
+      uses: mattdavis0351/actions/docker-gpr@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        image-name: hypothesis-feeds
+
+    - name: Update deployment file
+      run: TAG=$(echo $GITHUB_SHA | tail -c4) && sed -i 's|<IMAGE>|docker.pkg.github.com/tennica/hypothesis-feeds:'${TAG}'|' $GITHUB_WORKSPACE/deployment.yml
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Save DigitalOcean kubeconfig
+      run: doctl kubernetes cluster kubeconfig save k8s-1-16-6-do-2-sfo2-1588357917119
+
+    - name: deploy postgres to cluster
+      uses: wahyd4/kubectl-helm-action@v0.1.2
+      env:
+        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      with:
+        args: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm upgrade --install -n hypothesis-feeds postgres bitnami/postgresql
+
+    - name: Deploy to DigitalOcean Kubernetes
+      run: kubectl apply -f $GITHUB_WORKSPACE/deployment.yml
+
+    - name: Verify deployment
+      run: kubectl rollout status -n hypothesis-feeds deployment/hypothesis-feeds
+
