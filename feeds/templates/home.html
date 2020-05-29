@@ -3,17 +3,17 @@
 {% set pager = render_pagination(blobs) %}
 
 {% block content %}
-    <h1>Blobs:</h1>
+    <h1>Articles:</h1>
     {{ pager }}
     <table class="table table-striped">
     <thead>
-        <th>id</th>
-        <th>blob</th>
+        <th>source</th>
+        <th>summary</th>
     </thead>
     {% for doc in blobs.items %}
         <tr>
-            <td>{{ doc.id }}</td>
-            <td>{{ doc.blob }}</td>
+            <td>{{ doc.blob.source }}</td>
+            <td>{{ doc.blob.summary_detail }}</td>
         </tr>
     {% endfor %}
     </table>
