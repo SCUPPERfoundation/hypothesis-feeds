@@ -1,3 +1,6 @@
 flask
 bootstrap-flask
+psycopg2
+bootstrap-flask
+feedparser
 uwsgi
