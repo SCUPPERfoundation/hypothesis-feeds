@@ -7,13 +7,13 @@
     {{ pager }}
     <table class="table table-striped">
     <thead>
-        <th>source</th>
         <th>summary</th>
+        <th>source</th>
     </thead>
     {% for doc in blobs.items %}
         <tr>
+            <td><a href="{{ doc.blob.link }}">{{ doc.blob.title }}</td>
             <td><a href="{{ doc.blob.source.href }}">{{ doc.blob.source.title }}</a></td>
-            <td>{{ doc.blob.summary_detail.value }}</td>
         </tr>
     {% endfor %}
     </table>
