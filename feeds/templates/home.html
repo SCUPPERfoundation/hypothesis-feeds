@@ -12,8 +12,8 @@
     </thead>
     {% for doc in blobs.items %}
         <tr>
-            <td><a href="{{ doc.blob.link }}">{{ doc.blob.title }}</td>
-            <td><a href="{{ doc.blob.source.href }}">{{ doc.blob.source.title }}</a></td>
+            <td><a href="{{ doc.blob.link }}" target="_blank">{{ doc.blob.title }}</td>
+            <td><a href="{{ doc.blob.source.href }}" target="_blank">{{ doc.blob.source.title }}</a></td>
         </tr>
     {% endfor %}
     </table>
